@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>YelePay Admin</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#f7f8fb;color:#252d37}
+button,a{font:inherit} a{text-decoration:none;color:inherit}
+
+.page{min-height:100vh;background:#f7f8fb}
+.content{min-height:100vh;padding:22px 28px 44px}
+.top{height:78px;display:flex;align-items:center;justify-content:space-between}
+.top h1{margin:0;font-size:30px;line-height:1;font-weight:700}
+.menu{
+  width:92px;height:58px;border:1px solid #dfe4ea;border-radius:11px;
+  background:#fff;color:#111;font-size:20px;display:grid;place-items:center
+}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(28,35,45,.10);z-index:40;
+}
+.drawer{
+  position:fixed;left:0;top:0;bottom:0;z-index:50;
+  width:58vw;min-width:300px;max-width:418px;
+  background:#fff;padding:38px 24px 30px;
+  border-right:1px solid #edf0f4;
+  box-shadow:12px 0 32px rgba(30,38,48,.08);
+  overflow-y:auto;
+}
+.brand{display:flex;align-items:center;gap:16px;padding:0 14px 30px}
+.logo{
+  width:54px;height:54px;border-radius:12px;background:#ff7a12;color:#fff;
+  display:grid;place-items:center;font-size:31px;font-weight:500;flex:0 0 54px
+}
+.brand strong{font-size:22px;font-weight:650;white-space:nowrap}
+
+nav{display:grid;gap:8px}
+nav a,.lock,.exit{
+  width:100%;min-height:62px;border:0;border-radius:9px;background:transparent;
+  display:flex;align-items:center;padding:0 21px;color:#56616f;
+  font-size:20px;font-weight:450
+}
+nav a.active{background:#fff0e6;color:#d9580c;font-weight:700}
+.lock{margin-top:28px;color:#b72d2c}
+.exit{color:#667581}
+
+.card{
+  background:#fff;border:1px solid #dfe4e8;border-radius:13px;
+  margin-bottom:24px;
+}
+.card.large{height:330px;padding:26px}
+.fake-input{height:44px;border:1px solid #8f949a;border-radius:3px;margin-top:104px}
+.card.small{height:150px}
+
+#closeDrawer{
+  position:absolute;opacity:0;pointer-events:none
+}
+#closeDrawer:checked ~ .page .drawer{
+  transform:translateX(-105%);
+}
+#closeDrawer:checked ~ .page .overlay{
+  display:none;
+}
+#closeDrawer:checked ~ .page .menu-open{display:grid}
+.menu-open{
+  position:fixed;top:22px;right:28px;z-index:10;
+  width:92px;height:58px;border:1px solid #dfe4ea;border-radius:11px;
+  background:#fff;color:#111;font-size:20px;place-items:center;display:none
+}
+#openDrawer{
+  position:absolute;opacity:0;pointer-events:none
+}
+#openDrawer:checked ~ .page .drawer{transform:translateX(0)!important}
+#openDrawer:checked ~ .page .overlay{display:block!important}
+
+@media(max-width:520px){
+  .drawer{width:82vw;min-width:0;max-width:360px;padding:34px 20px 28px}
+  .brand strong{font-size:20px}
+  nav a,.lock,.exit{min-height:58px;font-size:18px;padding:0 18px}
+  .content{padding:20px 18px 36px}
+  .top h1{font-size:28px}
+}
+@media(min-width:761px){
+  .drawer{width:290px;min-width:290px;max-width:290px}
+  .overlay{display:none}
+  .content{margin-left:290px;padding:30px 34px}
+  .menu,.menu-open{display:none!important}
+}
+</style>
+</head>
+<body>
+<input id="closeDrawer" type="checkbox">
+<input id="openDrawer" type="checkbox">
+<div class="page">
+  <label class="overlay" for="closeDrawer" aria-label="Close menu"></label>
+
+  <aside class="drawer">
+    <div class="brand">
+      <span class="logo">Y</span>
+      <strong>YelePay Admin</strong>
+    </div>
+    <nav>
+      <a class="active" href="#">Dashboard</a>
+      <a href="#">Users</a>
+      <a href="#">Orders</a>
+      <a href="#">Payment / UPI</a>
+      <a href="#">Withdrawals</a>
+      <a href="#">Gift Codes</a>
+      <a href="#">Popups</a>
+      <a href="#">Banners</a>
+      <a href="#">Tutorials</a>
+      <a href="#">Settings</a>
+    </nav>
+    <div class="lock">Lock Admin</div>
+    <div class="exit">Exit Admin</div>
+  </aside>
+
+  <label class="menu-open" for="openDrawer">Menu</label>
+
+  <main class="content">
+    <header class="top">
+      <h1>Dashboard</h1>
+      <div class="menu">Menu</div>
+    </header>
+    <section>
+      <div class="card large"><div class="fake-input"></div></div>
+      <div class="card small"></div>
+      <div class="card small"></div>
+      <div class="card small"></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>
