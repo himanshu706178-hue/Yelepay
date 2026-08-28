@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YelePay Admin</title>
+<style>
+:root{
+  --bg:#f7f8fb; --card:#fff; --text:#252d37; --muted:#657181;
+  --line:#e2e6eb; --orange:#f36f0a; --orange-soft:#fff0e6;
+  --danger:#bb2c2b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input{font:inherit}
+a{text-decoration:none;color:inherit}
+body.locked{overflow:hidden}
+
+.app{min-height:100vh}
+.backdrop{
+  position:fixed;inset:0;background:rgba(24,31,40,.16);z-index:90;
+  opacity:0;visibility:hidden;transition:.2s ease
+}
+.backdrop.show{opacity:1;visibility:visible}
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:300px;z-index:100;
+  background:#fff;border-right:1px solid #eef0f3;padding:34px 22px 28px;
+  overflow:auto;transition:transform .22s ease;
+}
+.brand{display:flex;align-items:center;gap:15px;padding:0 12px 28px}
+.logo{
+  width:54px;height:54px;border-radius:12px;background:var(--orange);
+  display:grid;place-items:center;color:#fff;font-size:30px;font-weight:700
+}
+.brand strong{font-size:22px;white-space:nowrap}
+nav{display:grid;gap:7px}
+nav button,.side-action{
+  width:100%;min-height:58px;border:0;border-radius:10px;background:transparent;
+  display:flex;align-items:center;padding:0 18px;color:#55616f;font-size:18px;
+  text-align:left;cursor:pointer
+}
+nav button.active{background:var(--orange-soft);color:#d95b09;font-weight:700}
+nav button:hover{background:#f8fafc}
+.side-action.lock{margin-top:28px;color:var(--danger)}
+.side-action.exit{color:#667481}
+
+.main{margin-left:300px;min-height:100vh;padding:28px 34px 40px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}
+.topbar h1{margin:0;font-size:30px}
+.menu{
+  display:none;min-width:92px;height:54px;border:1px solid var(--line);
+  border-radius:11px;background:#fff;font-size:18px;cursor:pointer
+}
+.grid{display:grid;gap:20px}
+.metrics{grid-template-columns:repeat(3,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px}
+.metric span{display:block;color:#7a8593;font-size:13px;margin-bottom:12px}
+.metric strong{font-size:30px}
+.panel-title{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
+.panel-title h2{margin:0;font-size:20px}
+.muted{color:#7a8593;font-size:13px}
+.list{display:grid;gap:12px}
+.row{border:1px solid var(--line);border-radius:12px;padding:15px 16px;display:flex;justify-content:space-between;gap:14px;align-items:center}
+.row strong{display:block;margin-bottom:4px}
+.row span{color:#7a8593;font-size:13px}
+.badge{padding:7px 10px;border-radius:999px;background:#eef8f2;color:#208752;font-size:12px;font-weight:700}
+.form{display:grid;gap:12px}
+.input{width:100%;height:48px;border:1px solid #d8dde4;border-radius:10px;padding:0 13px;background:#fff}
+.btn{height:48px;border:0;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;cursor:pointer;padding:0 18px}
+.btn.secondary{background:#f3f5f8;color:#3a4653}
+.qr-wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.qr-preview{width:128px;height:128px;border:1px dashed #cfd6de;border-radius:14px;display:grid;place-items:center;background:#fafbfc;overflow:hidden;color:#8a94a0;font-size:12px;text-align:center;padding:8px}
+.qr-preview img{width:100%;height:100%;object-fit:contain;background:#fff}
+.hidden{display:none!important}
+.notice{padding:13px 14px;border-radius:10px;background:#fff8e8;border:1px solid #f2dfb5;color:#765b1f;font-size:13px}
+
+@media(max-width:760px){
+  .sidebar{width:min(82vw,360px);transform:translateX(-104%);box-shadow:none}
+  .sidebar.open{transform:translateX(0);box-shadow:14px 0 36px rgba(20,30,42,.12)}
+  .main{margin-left:0;padding:22px 18px 34px}
+  .menu{display:block}
+  .metrics{grid-template-columns:1fr}
+  .topbar h1{font-size:28px}
+  .row{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="backdrop" class="backdrop"></div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <div class="logo">Y</div>
+      <strong>YelePay Admin</strong>
+    </div>
+
+    <nav id="nav">
+      <button class="active" data-page="Dashboard">Dashboard</button>
+      <button data-page="Users">Users</button>
+      <button data-page="Orders">Orders</button>
+      <button data-page="Payment / UPI">Payment / UPI</button>
+      <button data-page="Withdrawals">Withdrawals</button>
+      <button data-page="Gift Codes">Gift Codes</button>
+      <button data-page="Popups">Popups</button>
+      <button data-page="Banners">Banners</button>
+      <button data-page="Tutorials">Tutorials</button>
+      <button data-page="Settings">Settings</button>
+    </nav>
+
+    <button class="side-action lock" id="lockBtn">Lock Admin</button>
+    <button class="side-action exit" id="exitBtn">Exit Admin</button>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <button id="menuBtn" class="menu">Menu</button>
+    </header>
+
+    <section id="dashboardPage">
+      <div class="grid metrics">
+        <div class="card metric"><span>Total Users</span><strong>1,248</strong></div>
+        <div class="card metric"><span>Orders Today</span><strong>87</strong></div>
+        <div class="card metric"><span>Pending Payments</span><strong>12</strong></div>
+      </div>
+      <div class="card" style="margin-top:20px">
+        <div class="panel-title"><h2>Recent Activity</h2><span class="muted">Preview</span></div>
+        <div class="list">
+          <div class="row"><div><strong>Order #YP10231</strong><span>UPI payment submitted</span></div><span class="badge">Processing</span></div>
+          <div class="row"><div><strong>New user registered</strong><span>User ID YP7842</span></div><span class="badge">Active</span></div>
+          <div class="row"><div><strong>Withdrawal request</strong><span>₹850 requested</span></div><span class="badge">Pending</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="genericPage" class="hidden">
+      <div class="card">
+        <div class="panel-title"><h2 id="genericTitle">Users</h2><span class="muted">Admin preview</span></div>
+        <div class="list" id="genericList"></div>
+      </div>
+    </section>
+
+    <section id="paymentPage" class="hidden">
+      <div class="card">
+        <div class="panel-title"><h2>Payment / UPI & Scanner</h2><span class="muted">Saved on this browser</span></div>
+        <div class="notice">This preview stores UPI settings locally. Your full Firebase version can use the same UI.</div>
+        <form id="upiForm" class="form" style="margin-top:16px">
+          <input id="holder" class="input" placeholder="Holder name" required>
+          <input id="upi" class="input" placeholder="UPI ID e.g. name@bank" required>
+          <div class="qr-wrap">
+            <label class="btn secondary" style="display:grid;place-items:center">
+              Choose Scanner
+              <input id="qrFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+            </label>
+            <div id="qrPreview" class="qr-preview">No scanner selected</div>
+          </div>
+          <button class="btn" type="submit">Save UPI + Scanner</button>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <div class="panel-title"><h2>Configured UPI</h2></div>
+        <div id="savedUpi" class="list"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const sidebar=document.getElementById('sidebar');
+const backdrop=document.getElementById('backdrop');
+const menuBtn=document.getElementById('menuBtn');
+const pageTitle=document.getElementById('pageTitle');
+const dashboardPage=document.getElementById('dashboardPage');
+const genericPage=document.getElementById('genericPage');
+const paymentPage=document.getElementById('paymentPage');
+const genericTitle=document.getElementById('genericTitle');
+const genericList=document.getElementById('genericList');
+
+function setDrawer(open){
+  sidebar.classList.toggle('open',open);
+  backdrop.classList.toggle('show',open);
+  document.body.classList.toggle('locked',open && innerWidth<=760);
+}
+menuBtn.addEventListener('click',()=>setDrawer(true));
+backdrop.addEventListener('click',()=>setDrawer(false));
+
+const sample={
+  Users:['Himanshu • Active','Rahul • Active','Aman • Suspended'],
+  Orders:['ORD908221 • ₹650','ORD908222 • ₹420','ORD908223 • ₹900'],
+  Withdrawals:['WD1021 • ₹850','WD1022 • ₹1,200','WD1023 • ₹500'],
+  'Gift Codes':['WELCOME100','YELE50','BONUS25'],
+  Popups:['Welcome popup • Active','Maintenance popup • Off'],
+  Banners:['Home banner • Active','Promo banner • Active'],
+  Tutorials:['How to Buy','How to Withdraw','UPI Setup'],
+  Settings:['Minimum deposit • ₹100','Theme • Default','Maintenance • Off']
+};
+
+document.querySelectorAll('#nav button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    const page=btn.dataset.page;
+    pageTitle.textContent=page;
+    dashboardPage.classList.add('hidden');
+    genericPage.classList.add('hidden');
+    paymentPage.classList.add('hidden');
+
+    if(page==='Dashboard'){
+      dashboardPage.classList.remove('hidden');
+    }else if(page==='Payment / UPI'){
+      paymentPage.classList.remove('hidden');
+      renderSaved();
+    }else{
+      genericPage.classList.remove('hidden');
+      genericTitle.textContent=page;
+      genericList.innerHTML=(sample[page]||['No preview data']).map(x=>
+        `<div class="row"><div><strong>${x}</strong><span>YelePay admin preview</span></div><span class="badge">Open</span></div>`
+      ).join('');
+    }
+    setDrawer(false);
+  });
+});
+
+document.getElementById('lockBtn').onclick=()=>alert('Admin locked (preview).');
+document.getElementById('exitBtn').onclick=()=>alert('Exit Admin (preview).');
+
+const qrFile=document.getElementById('qrFile');
+const qrPreview=document.getElementById('qrPreview');
+let qrData='';
+
+qrFile.addEventListener('change',()=>{
+  const file=qrFile.files && qrFile.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    qrData=String(reader.result||'');
+    qrPreview.innerHTML=`<img src="${qrData}" alt="QR scanner preview">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('upiForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const holder=document.getElementById('holder').value.trim();
+  const upi=document.getElementById('upi').value.trim();
+  if(!upi.includes('@')){alert('Enter a valid UPI ID.');return}
+  const data={holder,upi,qrData};
+  localStorage.setItem('yelepay_admin_upi_preview',JSON.stringify(data));
+  renderSaved();
+  alert('UPI saved in preview.');
+});
+
+function renderSaved(){
+  const box=document.getElementById('savedUpi');
+  let data=null;
+  try{data=JSON.parse(localStorage.getItem('yelepay_admin_upi_preview')||'null')}catch(e){}
+  if(!data){
+    box.innerHTML='<div class="row"><div><strong>No UPI configured</strong><span>Add one above.</span></div></div>';
+    return;
+  }
+  box.innerHTML=`<div class="row">
+    <div style="display:flex;gap:12px;align-items:center">
+      ${data.qrData?`<img src="${data.qrData}" style="width:64px;height:64px;object-fit:contain;border:1px solid #e2e6eb;border-radius:10px;background:#fff">`:''}
+      <div><strong>${data.holder||'YelePay'}</strong><span>${data.upi}</span></div>
+    </div>
+    <button class="btn secondary" id="deleteUpi" style="height:40px">Delete</button>
+  </div>`;
+  const del=document.getElementById('deleteUpi');
+  if(del)del.onclick=()=>{localStorage.removeItem('yelepay_admin_upi_preview');renderSaved()};
+}
+
+renderSaved();
+if(innerWidth<=760){setTimeout(()=>setDrawer(false),0)}
+</script>
+</body>
+</html>
